@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart — TacticalPrints</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+</head>
+<body>
+
+<div class="topbar">Relaunch in progress — placeholder photos until real prints are shot. Read the disclaimer before ordering.</div>
+
+<header class="site-header">
+  <div class="nav-wrap">
+    <a href="index.html" class="brand"><img src="assets/logo.svg" alt="Tactical Prints Lab" class="brand-logo"> TacticalPrints</a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">Info</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <a href="cart.html" class="cart-link active">Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Your Cart</h2>
+      </div>
+
+      <div class="panel" style="margin-bottom:20px; border-color:var(--orange-dim);">
+        <strong style="color:var(--orange); font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:13px; letter-spacing:0.04em;">Checkout note</strong>
+        <p style="margin:8px 0 0; color:var(--text-dim); font-size:14.5px;">Online payment isn't wired up yet — this cart is a working preview of the shop UI. Hitting checkout below will draft an email with your order so you can send it over manually while payment (Stripe / PayPal) gets set up.</p>
+      </div>
+
+      <div id="cart-content"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <span>&copy; <span id="year"></span> TacticalPrints. All prints made to order.</span>
+      <span>Site under active relaunch — pricing &amp; checkout subject to change.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/products.js"></script>
+<script src="assets/cart.js"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  function render() {
+    const lines = cartLines();
+    const content = document.getElementById("cart-content");
+
+    if (!lines.length) {
+      content.innerHTML = `
+        <div class="empty-cart">
+          <p>Your cart is empty.</p>
+          <a href="shop.html" class="btn" style="margin-top:10px;">Browse the catalog</a>
+        </div>`;
+      return;
+    }
+
+    const rows = lines.map(l => `
+      <tr data-id="${l.id}">
+        <td>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cart-item-media"><img src="${l.img}" alt="${l.name}"></div>
+            <div>
+              <div class="cart-item-name">${l.name}</div>
+              <div class="product-cat">${CATEGORIES[l.category].label}</div>
+            </div>
+          </div>
+        </td>
+        <td>€${l.price.toFixed(2)}</td>
+        <td>
+          <div class="qty-control">
+            <button data-dec>−</button>
+            <input type="text" value="${l.qty}" data-qty readonly>
+            <button data-inc>+</button>
+          </div>
+        </td>
+        <td>€${l.lineTotal.toFixed(2)}</td>
+        <td><span class="remove-link" data-remove>Remove</span></td>
+      </tr>
+    `).join("");
+
+    const subtotal = cartSubtotal();
+
+    content.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="cart-table">
+          <thead>
+            <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div style="display:flex; justify-content:flex-end; margin-top:26px;">
+        <div class="cart-summary" style="min-width:300px;">
+          <div class="summary-row"><span>Subtotal</span><span>€${subtotal.toFixed(2)}</span></div>
+          <div class="summary-row"><span>Shipping</span><span>Calculated at order</span></div>
+          <div class="summary-row total"><span>Total</span><span>€${subtotal.toFixed(2)}</span></div>
+          <button class="btn btn-block" id="checkout-btn" style="margin-top:16px;">Checkout (email order)</button>
+          <a href="shop.html" class="btn btn-outline btn-block" style="margin-top:10px;">Continue shopping</a>
+        </div>
+      </div>
+    `;
+
+    content.querySelectorAll("[data-inc]").forEach(btn => btn.addEventListener("click", e => {
+      const id = e.target.closest("tr").dataset.id;
+      const line = lines.find(l => l.id === id);
+      setQty(id, line.qty + 1);
+      render();
+    }));
+    content.querySelectorAll("[data-dec]").forEach(btn => btn.addEventListener("click", e => {
+      const id = e.target.closest("tr").dataset.id;
+      const line = lines.find(l => l.id === id);
+      setQty(id, line.qty - 1);
+      render();
+    }));
+    content.querySelectorAll("[data-remove]").forEach(btn => btn.addEventListener("click", e => {
+      const id = e.target.closest("tr").dataset.id;
+      removeFromCart(id);
+      render();
+    }));
+
+    document.getElementById("checkout-btn").addEventListener("click", () => {
+      const body = lines.map(l => `${l.qty} x ${l.name} — €${l.lineTotal.toFixed(2)}`).join("%0D%0A");
+      const subject = encodeURIComponent("TacticalPrints order request");
+      const mailBody = `Hi, I'd like to order:%0D%0A%0D%0A${body}%0D%0A%0D%0ATotal: €${subtotal.toFixed(2)}%0D%0A%0D%0AName:%0D%0AShipping address:%0D%0A`;
+      window.location.href = `mailto:${CHECKOUT_EMAIL}?subject=${subject}&body=${mailBody}`;
+    });
+  }
+
+  render();
+</script>
+</body>
+</html>

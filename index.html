@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TacticalPrints — 3D Printed Gear for Airsoft, EDC & More</title>
+<meta name="description" content="TacticalPrints: 3D printed airsoft attachments, EDC gear, bookmarks, and novelty chess sets. Relaunching with a whole new lineup.">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+</head>
+<body>
+
+<div class="topbar">Relaunch in progress — placeholder photos until real prints are shot. Read the disclaimer before ordering.</div>
+
+<header class="site-header">
+  <div class="nav-wrap">
+    <a href="index.html" class="brand"><img src="assets/logo.svg" alt="Tactical Prints Lab" class="brand-logo"> TacticalPrints</a>
+    <nav class="main-nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">Info</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <a href="cart.html" class="cart-link">Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow">Relaunching 2026</span>
+      <h1>3D-printed gear for people who actually use their gear.</h1>
+      <p class="lead">Airsoft loadout parts, everyday-carry fixes, and the bookmarks that started it — designed, printed, and shipped from a one-person shop that's rebuilding from the ground up.</p>
+      <div class="cta-row">
+        <a href="shop.html" class="btn">Shop the catalog</a>
+        <a href="about.html" class="btn btn-outline">Read the story</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust-strip">
+    <div class="container">
+      <div class="trust-grid">
+        <div class="trust-item">
+          <div class="trust-icon">FDM</div>
+          <div class="trust-copy"><div class="t">FDM &amp; MSLA printing</div><div class="s">Whichever process fits the part</div></div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">1:1</div>
+          <div class="trust-copy"><div class="t">Printed to order</div><div class="s">No warehouse, no stockpile</div></div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon">DE</div>
+          <div class="trust-copy"><div class="t">One-person shop</div><div class="s">Based in Germany, ships everywhere</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Shop by category</h2>
+        <p>Four lines, one printer running overtime.</p>
+      </div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="section-head">
+        <h2>Featured prints</h2>
+        <p>A mix from across the catalog.</p>
+      </div>
+      <div class="product-grid" id="featured-grid"></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="disclaimer">
+        <strong>Heads up:</strong> product photos across this site are placeholders while the full catalog gets reshot with real prints. Colors and small details may vary from what's pictured — see the <a href="about.html">Info page</a> for the full disclaimer.
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4><img src="assets/logo.svg" alt="" class="footer-logo"> TacticalPrints</h4>
+        <p>One-person 3D printing shop. Airsoft gear, EDC fixes, bookmarks, and novelty chess sets — printed to order.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html?cat=airsoft">Airsoft & Loadout</a></li>
+          <li><a href="shop.html?cat=edc">EDC & Useful Stuff</a></li>
+          <li><a href="shop.html?cat=bookmarks">Bookmarks</a></li>
+          <li><a href="shop.html?cat=chess">Novelty Chess (18+)</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Site</h4>
+        <ul>
+          <li><a href="about.html">Info & Disclaimer</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="cart.html">Cart</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span id="year"></span> TacticalPrints. All prints made to order.</span>
+      <span>Site under active relaunch — pricing &amp; checkout subject to change.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/products.js"></script>
+<script src="assets/cart.js"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const catGrid = document.getElementById("cat-grid");
+  Object.entries(CATEGORIES).forEach(([key, cat], i) => {
+    const sampleImg = placeholderImg(key, i);
+    const tile = document.createElement("a");
+    tile.href = `shop.html?cat=${key}`;
+    tile.className = "cat-tile";
+    tile.innerHTML = `
+      <div class="cat-tile-bg" style="background:url('${sampleImg}') center/cover;"></div>
+      <div class="cat-tile-label">${cat.label}<span>${cat.sub}</span></div>
+    `;
+    catGrid.appendChild(tile);
+  });
+
+  const featuredGrid = document.getElementById("featured-grid");
+  const featured = PRODUCTS.filter(p => p.badge).concat(PRODUCTS.slice(0,2)).slice(0,4);
+  featured.forEach(p => featuredGrid.appendChild(renderProductCard(p)));
+
+  function renderProductCard(p) {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="product-media">
+        ${p.badge ? `<span class="badge badge-orange">${p.badge}</span>` : ""}
+        ${p.badge18 ? `<span class="badge badge-18">18+</span>` : ""}
+        <img src="${p.img}" alt="${p.name}">
+      </div>
+      <div class="product-info">
+        <span class="product-cat">${CATEGORIES[p.category].label}</span>
+        <span class="product-name">${p.name}</span>
+        <span class="product-desc">${p.desc}</span>
+        <div class="product-foot">
+          <span class="price">€${p.price.toFixed(2)}</span>
+          <button class="btn btn-sm" data-add="${p.id}">Add to cart</button>
+        </div>
+      </div>
+    `;
+    card.querySelector("[data-add]").addEventListener("click", () => addToCart(p.id));
+    return card;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — TacticalPrints</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+</head>
+<body>
+
+<div class="topbar">Relaunch in progress — placeholder photos until real prints are shot. Read the disclaimer before ordering.</div>
+
+<header class="site-header">
+  <div class="nav-wrap">
+    <a href="index.html" class="brand"><img src="assets/logo.svg" alt="Tactical Prints Lab" class="brand-logo"> TacticalPrints</a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="about.html">Info</a>
+      <a href="contact.html" class="active">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <a href="cart.html" class="cart-link">Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="section">
+    <div class="container" style="max-width:640px;">
+      <span class="eyebrow">Get in touch</span>
+      <h1 style="font-size:36px; margin-top:14px;">Custom request, question, or bulk order?</h1>
+      <p style="color:var(--text-dim);">Send a message and it'll land straight in the inbox — no contact-form backend needed yet.</p>
+
+      <form id="contact-form" style="margin-top:28px;">
+        <label for="name">Name</label>
+        <input type="text" id="name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" required>
+
+        <label for="topic">What's this about</label>
+        <select id="topic">
+          <option>General question</option>
+          <option>Custom color / design request</option>
+          <option>Bulk / wholesale order</option>
+          <option>Airsoft gear</option>
+          <option>Novelty Chess (18+)</option>
+          <option>Something else</option>
+        </select>
+
+        <label for="message">Message</label>
+        <textarea id="message" required></textarea>
+
+        <button type="submit" class="btn btn-block">Send message</button>
+      </form>
+
+      <div class="panel" style="margin-top:36px;">
+        <h4 style="margin-bottom:10px;">Other ways to reach out</h4>
+        <p style="color:var(--text-dim); margin:0 0 6px;">Email: <a href="mailto:patryk@tacticalprints.de">patryk@tacticalprints.de</a></p>
+        <p style="color:var(--text-dim); margin:0;">Instagram: <a href="https://instagram.com/tacticalprints" target="_blank" rel="noopener">@tacticalprints</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-bottom">
+      <span>&copy; <span id="year"></span> TacticalPrints. All prints made to order.</span>
+      <span>Site under active relaunch — pricing &amp; checkout subject to change.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/products.js"></script>
+<script src="assets/cart.js"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  document.getElementById("contact-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const topic = document.getElementById("topic").value;
+    const message = document.getElementById("message").value;
+    const subject = encodeURIComponent(`[${topic}] Message from ${name}`);
+    const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+    window.location.href = `mailto:patryk@tacticalprints.de?subject=${subject}&body=${body}`;
+  });
+</script>
+</body>
+</html>
