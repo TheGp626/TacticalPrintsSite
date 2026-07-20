@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — TacticalPrints</title>
+<meta name="description" content="Browse TacticalPrints: airsoft attachments, EDC gear, bookmarks, and novelty chess sets.">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+</head>
+<body>
+
+<div class="topbar">Relaunch in progress — placeholder photos until real prints are shot. Read the disclaimer before ordering.</div>
+
+<header class="site-header">
+  <div class="nav-wrap">
+    <a href="index.html" class="brand"><img src="assets/logo.svg" alt="Tactical Prints Lab" class="brand-logo"> TacticalPrints</a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="shop.html" class="active">Shop</a>
+      <a href="about.html">Info</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav-right">
+      <a href="cart.html" class="cart-link">Cart <span class="cart-count">0</span></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="section" style="padding-bottom:0;">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="shop-title">Full Catalog</h2>
+        <p id="shop-count"></p>
+      </div>
+      <div class="product-toolbar" id="filter-bar"></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:24px;">
+    <div class="container">
+      <div class="product-grid" id="product-grid"></div>
+      <p id="no-results" class="empty-cart" style="display:none;">No products in this category yet.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4><img src="assets/logo.svg" alt="" class="footer-logo"> TacticalPrints</h4>
+        <p>One-person 3D printing shop. Airsoft gear, EDC fixes, bookmarks, and novelty chess sets — printed to order.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html?cat=airsoft">Airsoft & Loadout</a></li>
+          <li><a href="shop.html?cat=edc">EDC & Useful Stuff</a></li>
+          <li><a href="shop.html?cat=bookmarks">Bookmarks</a></li>
+          <li><a href="shop.html?cat=chess">Novelty Chess (18+)</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Site</h4>
+        <ul>
+          <li><a href="about.html">Info & Disclaimer</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="cart.html">Cart</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span id="year"></span> TacticalPrints. All prints made to order.</span>
+      <span>Site under active relaunch — pricing &amp; checkout subject to change.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/products.js"></script>
+<script src="assets/cart.js"></script>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const params = new URLSearchParams(window.location.search);
+  let activeCat = params.get("cat") || "all";
+
+  const filterBar = document.getElementById("filter-bar");
+  const grid = document.getElementById("product-grid");
+  const shopTitle = document.getElementById("shop-title");
+  const shopCount = document.getElementById("shop-count");
+  const noResults = document.getElementById("no-results");
+
+  function buildFilterBar() {
+    filterBar.innerHTML = "";
+    const allChip = makeChip("all", "All Products");
+    filterBar.appendChild(allChip);
+    Object.entries(CATEGORIES).forEach(([key, cat]) => {
+      filterBar.appendChild(makeChip(key, cat.label));
+    });
+  }
+
+  function makeChip(key, label) {
+    const chip = document.createElement("button");
+    chip.className = "chip" + (key === activeCat ? " active" : "");
+    chip.textContent = label;
+    chip.addEventListener("click", () => {
+      activeCat = key;
+      const url = new URL(window.location);
+      if (key === "all") url.searchParams.delete("cat");
+      else url.searchParams.set("cat", key);
+      history.replaceState(null, "", url);
+      render();
+    });
+    return chip;
+  }
+
+  function render() {
+    buildFilterBar();
+    const list = activeCat === "all" ? PRODUCTS : PRODUCTS.filter(p => p.category === activeCat);
+    shopTitle.textContent = activeCat === "all" ? "Full Catalog" : CATEGORIES[activeCat].label;
+    shopCount.textContent = `${list.length} item${list.length !== 1 ? "s" : ""}`;
+    grid.innerHTML = "";
+    noResults.style.display = list.length ? "none" : "block";
+    list.forEach(p => grid.appendChild(renderProductCard(p)));
+  }
+
+  function renderProductCard(p) {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="product-media">
+        ${p.badge ? `<span class="badge badge-orange">${p.badge}</span>` : ""}
+        ${p.badge18 ? `<span class="badge badge-18">18+</span>` : ""}
+        <img src="${p.img}" alt="${p.name}">
+      </div>
+      <div class="product-info">
+        <span class="product-cat">${CATEGORIES[p.category].label}</span>
+        <span class="product-name">${p.name}</span>
+        <span class="product-desc">${p.desc}</span>
+        <div class="product-foot">
+          <span class="price">€${p.price.toFixed(2)}</span>
+          <button class="btn btn-sm" data-add="${p.id}">Add to cart</button>
+        </div>
+      </div>
+    `;
+    card.querySelector("[data-add]").addEventListener("click", () => addToCart(p.id));
+    return card;
+  }
+
+  render();
+</script>
+</body>
+</html>
